@@ -236,7 +236,7 @@ module.exports = function (db, name) {
 
     if (!resource) {
       var nativeId = utils.toNative(req.params.id)
-      var resource = req.method === 'PATCH' ?
+      resource = req.method === 'PATCH' ?
         db(name).updateById(nativeId, req.body) :
         db(name).replaceById(nativeId, req.body)
     }
