@@ -182,8 +182,13 @@ module.exports = function (db, name) {
   function show (req, res, next) {
     var _embed = req.query._embed
     var _expand = req.query._expand
-    var id = utils.toNative(req.params.id)
+    var id = req.params.id
     var resource = db(name).getById(id)
+
+    if (!resource) {
+      var nativeId = utils.toNative(req.params.id)
+      resource = db(name).getById(nativeId)
+    }
 
     if (resource) {
       // Clone resource to avoid making changes to the underlying object
@@ -224,11 +229,17 @@ module.exports = function (db, name) {
       req.body[key] = utils.toNative(req.body[key])
     }
 
-    var id = utils.toNative(req.params.id)
-
+    var id = req.params.id
     var resource = req.method === 'PATCH' ?
       db(name).updateById(id, req.body) :
       db(name).replaceById(id, req.body)
+
+    if (!resource) {
+      var nativeId = utils.toNative(req.params.id)
+      var resource = req.method === 'PATCH' ?
+        db(name).updateById(nativeId, req.body) :
+        db(name).replaceById(nativeId, req.body)
+    }
 
     if (resource) {
       res.locals.data = resource
